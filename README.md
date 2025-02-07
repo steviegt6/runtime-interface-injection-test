@@ -12,7 +12,7 @@ What works?
 What doesn't work?
 
 - JIT-optimizable expressions (e.g. `myObj is IInterface` for sealed types) evaluate to `false` :(,
-  - but `(IInterface)(object)myObj` still evaluates to `true`!
+  - but `(IInterface)myObj` still evaluates to `true`!
 - VTable injection doesn't work yet
   - trying to figure out an ideal and sensible API
     - need to handle multiple methods (can't assume idx 0) and how to define them.
