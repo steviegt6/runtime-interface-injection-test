@@ -5,41 +5,31 @@ using Outerface.CompilerServices.Handles;
 
 namespace Outerface;
 
-public readonly record struct InterfaceIdentity(
-    Type InterfaceType,
-    Type InterfaceImplementationType
-);
-
 public static class InterfaceInjector
 {
-    public static void InjectInterface(Type origType, InterfaceIdentity interfaceIdentity)
-    {
-        InjectInterfaces(origType, interfaceIdentity);
-    }
-
-    public static void InjectInterfaces(Type origType, params InterfaceIdentity[] interfaceIdentities)
-    {
-        InjectInterfacesIntoClass(origType, interfaceIdentities);
-    }
-
-    public static MethodTableHandle GetMethodTable(Type type)
-    {
-        return new MethodTableHandle(type.TypeHandle.Value);
-    }
-
-    private static void InjectInterfacesIntoClass(
-        Type                target,
-        InterfaceIdentity[] interfaces
+    public static void InjectInterfaces(
+        Type                       target,
+        params InterfaceIdentity[] interfaces
     )
     {
-        // RuntimeHelpers.PrepareConstrainedRegions();
         foreach (var interfaceIdentity in interfaces)
         {
-            InjectInterfaceIntoClass(target, interfaceIdentity);
+            InjectInterface(target, interfaceIdentity);
         }
     }
+    
+    public static MethodTableHandle GetMethodTable(Type type)
+    {
+        var handle = MethodTableHandle.Create(type.TypeHandle.Value);
+        if (handle is null)
+        {
+            throw new ArgumentException("Type must be a valid reference type.", nameof(type));
+        }
 
-    private static unsafe void InjectInterfaceIntoClass(
+        return handle;
+    }
+    
+    private static unsafe void InjectInterface(
         Type              target,
         InterfaceIdentity interfaceIdentity
     )

@@ -1,11 +1,13 @@
 namespace Outerface.CompilerServices.Handles;
 
 [TypeDef("src/coreclr/vm/methodtable.h", "class MethodTable")]
-public sealed class MethodTableHandle(nint value) : AbstractHandle(value), IHandleFactory<MethodTableHandle>
+public sealed class MethodTableHandle : AbstractHandle, IHandleFactory<MethodTableHandle>
 {
     private static int ParentMethodTableOffset => 0x10 + InternalConstants.DEBUG_CLASS_NAME_PTR;
 
     private static int InterfaceMapOffset => nint.Size == 8 ? 0x38 + InternalConstants.DEBUG_CLASS_NAME_PTR : 0x24 + InternalConstants.DEBUG_CLASS_NAME_PTR;
+
+    private MethodTableHandle(nint value) : base(value) { }
 
 #region ComponentSize
     /// <summary>
@@ -69,53 +71,56 @@ public sealed class MethodTableHandle(nint value) : AbstractHandle(value), IHand
     public unsafe MethodTableHandle[] InterfaceMap => GetArray<MethodTableHandle>(InterfaceMapPtr, InterfaceCount);
 #endregion
 
-    /*
-
-
     /// <summary>
-    /// Gets whether the type has a component size (i.e., is an array or string).
+    ///     Gets whether the type has a component size (i.e., is an array or
+    ///     string).
     /// </summary>
     public bool HasComponentSize => (Flags & 0x80000000) != 0;
 
     /// <summary>
-    /// Gets whether the type contains GC pointers.
+    ///     Gets whether the type contains GC pointers.
     /// </summary>
-    public bool ContainsGCPointers => (Flags & 0x01000000) != 0;
+    public bool ContainsGcPointers => (Flags & 0x01000000) != 0;
 
     /// <summary>
-    /// Gets whether the type is an interface.
+    ///     Gets whether the type is an interface.
     /// </summary>
     public bool IsInterface => (Flags & 0x000C0000) == 0x000C0000;
 
     /// <summary>
-    /// Gets whether the type is a value type.
+    ///     Gets whether the type is a value type.
     /// </summary>
     public bool IsValueType => (Flags & 0x000C0000) == 0x00040000;
 
     /// <summary>
-    /// Gets whether the type is a nullable type.
+    ///     Gets whether the type is a nullable type.
     /// </summary>
     public bool IsNullable => (Flags & 0x000F0000) == 0x00050000;
 
     /// <summary>
-    /// Gets the rank of a multi-dimensional array, or 0 if not an array.
+    ///     Gets the rank of a multidimensional array, or 0 if not an array.
     /// </summary>
     public int MultiDimensionalArrayRank
     {
         get
         {
-            if (!HasComponentSize) return 0;
-            return (int)((BaseSize - (uint)(3 * IntPtr.Size)) / (uint)(2 * sizeof(int)));
+            if (!HasComponentSize)
+            {
+                return 0;
+            }
+
+            return (int)((BaseSize - (uint)(3 * nint.Size)) / (2 * sizeof(int)));
         }
     }
 
     /// <summary>
-    /// Determines whether two MethodTableHandles refer to the same type.
+    ///     Determines whether two <see cref="MethodTableHandle"/>s refer to the
+    ///     same type.
     /// </summary>
-    public static bool AreSameType(MethodTableHandle mt1, MethodTableHandle mt2) => mt1._methodTablePtr == mt2._methodTablePtr;
-
-
-     */
+    public static bool AreSameType(MethodTableHandle mt1, MethodTableHandle mt2)
+    {
+        return mt1.Value == mt2.Value;
+    }
 
 #region Factory
     public static MethodTableHandle Create(nint value)

@@ -1,8 +1,10 @@
 namespace Outerface.CompilerServices.Handles;
 
 [TypeDef("src/coreclr/vm/methodtable.h", "struct InterfaceInfo_t")]
-public sealed class InterfaceInfoHandle(nint value) : AbstractHandle(value), IHandleFactory<InterfaceInfoHandle>
+public sealed class InterfaceInfoHandle : AbstractHandle, IHandleFactory<InterfaceInfoHandle>
 {
+    private InterfaceInfoHandle(nint value) : base(value) { }
+
 #region MethodTable
     /// <summary>
     ///     Method table of the interface.
