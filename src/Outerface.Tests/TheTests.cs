@@ -27,7 +27,7 @@ public static class TheTests
         Assert.That(methodTableTwo.InterfaceCount, Is.EqualTo(2));
     }
 
-    public class CanWePatternMatchThis_Class;
+    private class CanWePatternMatchThis_Class;
 
     private interface ICanWePatternMatchThis_Interface;
 
