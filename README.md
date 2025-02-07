@@ -6,7 +6,8 @@ What works?
 
 - interfaces are injected into the MT at runtime,
 - `(IInterface)(object)myObj` for an injected interface evaluates to `true`,
-- `myObj is IInterface` for non-sealed types evaluates to `true`.
+- `myObj is IInterface` for non-sealed types evaluates to `true`,
+- injections are retroactively applied to already-instatiated types because they just modify the MT (shared between instances).
 
 What doesn't work?
 
