@@ -51,15 +51,15 @@ public static class InterfaceInjector
         var newSize         = (targetMt.InterfaceCount + 1) * sizeof(nint);
         var newInterfaceMap = Marshal.AllocHGlobal(newSize);
         Buffer.MemoryCopy((void*)targetMt.InterfaceMapPtr, (void*)newInterfaceMap, newSize, newSize - sizeof(nint));
-        
+
         // Add new interface entry
-        var interfaceEntries = (MethodTableHandle.InterfaceInfo*)newInterfaceMap;
-        interfaceEntries[targetMt.InterfaceCount].MethodTablePtr = interfaceMt.Value;
-        
+        var interfaceEntries = AbstractHandle.GetArray<InterfaceInfoHandle>(newInterfaceMap, newSize);
+        interfaceEntries[targetMt.InterfaceCount].MethodTablePtr = interfaceMt.DangerousGetHandle();
+
         // Update target's MethodTable
         targetMt.InterfaceMapPtr = newInterfaceMap;
         targetMt.InterfaceCount++;
-        
+
         // TODO: modify vtable
     }
 }

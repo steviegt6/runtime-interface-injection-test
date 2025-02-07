@@ -54,6 +54,14 @@ public abstract class AbstractHandle
     }
 
     /// <summary>
+    ///     Gets the pointer value.
+    /// </summary>
+    public nint DangerousGetHandle()
+    {
+        return Value;
+    }
+
+    /// <summary>
     ///     Gets a reference to a value at a given offset.
     /// </summary>
     protected unsafe ref T GetRef<T>(int offset) where T : unmanaged
