@@ -40,6 +40,7 @@ public static class TheTests
         InterfaceInjector.InjectInterface(typeof(CanWePatternMatchThis_Class), new InterfaceIdentity(typeof(ICanWePatternMatchThis_Interface), null));
         var b = new CanWePatternMatchThis_Class();
         Assert.That(b is ICanWePatternMatchThis_Interface, Is.True);
+        Assert.That(a is ICanWePatternMatchThis_Interface, Is.True);
         try
         {
             var c = (ICanWePatternMatchThis_Interface)(object)b;
