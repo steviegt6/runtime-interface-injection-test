@@ -12,9 +12,9 @@ public sealed class MethodTableHandle
         public nint MethodTablePtr;
     }
 
-    public static int ParentMethodTableOffset => 0x10 + InternalConstants.DebugClassNamePtr;
+    public static int ParentMethodTableOffset => 0x10 + InternalConstants.DEBUG_CLASS_NAME_PTR;
 
-    public static int InterfaceMapOffset => nint.Size == 8 ? 0x38 + InternalConstants.DebugClassNamePtr : 0x24 + InternalConstants.DebugClassNamePtr;
+    public static int InterfaceMapOffset => nint.Size == 8 ? 0x38 + InternalConstants.DEBUG_CLASS_NAME_PTR : 0x24 + InternalConstants.DEBUG_CLASS_NAME_PTR;
 
     public nint Value { get; }
 
