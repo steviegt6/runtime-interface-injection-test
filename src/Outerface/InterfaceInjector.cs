@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-using Outerface.CompilerServices;
+using Outerface.CompilerServices.Handles;
 
 namespace Outerface;
 

@@ -1,75 +1,63 @@
-using System;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+namespace Outerface.CompilerServices.Handles;
 
-namespace Outerface.CompilerServices;
-
-public sealed class MethodTableHandle
+[TypeDef("src/coreclr/vm/methodtable.h", "class MethodTable")]
+public sealed class MethodTableHandle(nint value) : AbstractHandle(value), IHandleFactory<MethodTableHandle>
 {
-    [StructLayout(LayoutKind.Sequential)]
-    public struct InterfaceInfo
-    {
-        public nint MethodTablePtr;
-    }
+    private static int ParentMethodTableOffset => 0x10 + InternalConstants.DEBUG_CLASS_NAME_PTR;
 
-    public static int ParentMethodTableOffset => 0x10 + InternalConstants.DEBUG_CLASS_NAME_PTR;
+    private static int InterfaceMapOffset => nint.Size == 8 ? 0x38 + InternalConstants.DEBUG_CLASS_NAME_PTR : 0x24 + InternalConstants.DEBUG_CLASS_NAME_PTR;
 
-    public static int InterfaceMapOffset => nint.Size == 8 ? 0x38 + InternalConstants.DEBUG_CLASS_NAME_PTR : 0x24 + InternalConstants.DEBUG_CLASS_NAME_PTR;
-
-    public nint Value { get; }
-
-    public MethodTableHandle(nint value)
-    {
-        if (value == nint.Zero)
-        {
-            throw new ArgumentException("Value cannot be zero.", nameof(value));
-        }
-
-        Value = value;
-    }
-
+#region ComponentSize
     /// <summary>
     ///     The low WORD of the first field is the component size for array and
     ///     string types.
     /// </summary>
     public ref ushort ComponentSize => ref GetRef<ushort>(0);
+#endregion
 
+#region Flags
     /// <summary>
     ///     The flags for the current method table (only for not array or string
     ///     types).
     /// </summary>
     public ref uint Flags => ref GetRef<uint>(0);
+#endregion
 
+#region BaseSize
     /// <summary>
     ///     Gets the base size of the type (used when allocating an instance on
     ///     the heap).
     /// </summary>
     public ref uint BaseSize => ref GetRef<uint>(4);
+#endregion
 
     // See additional native members in methodtable.h, not needed here yet.
     // 0x8: m_dwFlags2 (additional flags and token in upper 24 bits)
     // 0xC: m_wNumVirtuals
 
+#region InterfaceCount
     /// <summary>
     ///     Gets the number of interfaces implemented by this type.
     /// </summary>
     public ref ushort InterfaceCount => ref GetRef<ushort>(0x0E);
+#endregion
 
     // For DEBUG builds, there is a conditional field here (see methodtable.h again).
     // 0x10: debug_m_szClassName (display name of the class, for the debugger)
 
+#region ParentMethodTable
     /// <summary>
-    /// Gets the parent method table handle.
+    ///     Gets the parent method table pointer.
     /// </summary>
-    public MethodTableHandle? ParentMethodTable
-    {
-        get
-        {
-            var parentPtr = GetValue<nint>(ParentMethodTableOffset);
-            return parentPtr == nint.Zero ? null : new MethodTableHandle(parentPtr);
-        }
-    }
+    public ref nint ParentMethodTablePtr => ref GetRef<nint>(ParentMethodTableOffset);
 
+    /// <summary>
+    ///     Gets the parent method table handle.
+    /// </summary>
+    public MethodTableHandle? ParentMethodTable => GetHandle<MethodTableHandle>(ParentMethodTableOffset);
+#endregion
+
+#region InterfaceMap
     /// <summary>
     ///     Gets the raw interface map pointer.
     /// </summary>
@@ -78,27 +66,8 @@ public sealed class MethodTableHandle
     /// <summary>
     ///     Gets the interface map for the type.
     /// </summary>
-    public unsafe MethodTableHandle[] InterfaceMap
-    {
-        get
-        {
-            var interfaceCount = InterfaceCount;
-
-            var interfaceMapPtr = InterfaceMapPtr;
-            if (interfaceMapPtr == nint.Zero || interfaceCount == 0)
-            {
-                return [];
-            }
-
-            var interfaceMap = new MethodTableHandle[interfaceCount];
-            for (var i = 0; i < interfaceCount; i++)
-            {
-                interfaceMap[i] = new MethodTableHandle(Unsafe.Read<nint>((void*)(interfaceMapPtr + i * nint.Size)));
-            }
-
-            return interfaceMap;
-        }
-    }
+    public unsafe MethodTableHandle[] InterfaceMap => GetArray<MethodTableHandle>(InterfaceMapPtr, InterfaceCount);
+#endregion
 
     /*
 
@@ -148,19 +117,15 @@ public sealed class MethodTableHandle
 
      */
 
-    /// <summary>
-    ///     Gets a reference to a value at a given offset.
-    /// </summary>
-    private unsafe ref T GetRef<T>(int offset) where T : unmanaged
+#region Factory
+    public static MethodTableHandle Create(nint value)
     {
-        return ref Unsafe.AsRef<T>((void*)(Value + offset));
+        return new MethodTableHandle(value);
     }
 
-    /// <summary>
-    ///     Gets a value at a given offset.
-    /// </summary>
-    private unsafe T GetValue<T>(int offset) where T : unmanaged
+    public static MethodTableHandle? CreateAllowInvalid(nint value)
     {
-        return Unsafe.Read<T>((void*)(Value + offset));
+        return value == nint.Zero ? null : new MethodTableHandle(value);
     }
+#endregion
 }
