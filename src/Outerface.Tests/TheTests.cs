@@ -41,11 +41,7 @@ public static class TheTests
         var b = new CanWePatternMatchThis_Class();
         Assert.That(b is ICanWePatternMatchThis_Interface, Is.True);
         Assert.That(a is ICanWePatternMatchThis_Interface, Is.True);
-        try
-        {
-            var c = (ICanWePatternMatchThis_Interface)(object)b;
-        }
-        catch { }
+        Assert.That((ICanWePatternMatchThis_Interface)b is ICanWePatternMatchThis_Interface, Is.True);
     }
 #endregion
 }
