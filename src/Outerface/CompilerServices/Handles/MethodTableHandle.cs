@@ -35,7 +35,11 @@ public sealed class MethodTableHandle : AbstractHandle, IHandleFactory<MethodTab
 
     // See additional native members in methodtable.h, not needed here yet.
     // 0x8: m_dwFlags2 (additional flags and token in upper 24 bits)
-    // 0xC: m_wNumVirtuals
+
+#region VirtualCount
+    public ref ushort VirtualCount => ref GetRef<ushort>(0x0C);
+#endregion
+
 
 #region InterfaceCount
     /// <summary>
