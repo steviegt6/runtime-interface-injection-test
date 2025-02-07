@@ -27,7 +27,7 @@ public static class TheTests
         Assert.That(methodTableTwo.InterfaceCount, Is.EqualTo(2));
     }
 
-    private sealed class CanWePatternMatchThis_Class;
+    public class CanWePatternMatchThis_Class;
 
     private interface ICanWePatternMatchThis_Interface;
 
@@ -37,9 +37,9 @@ public static class TheTests
         var a = new CanWePatternMatchThis_Class();
         Assert.That(a is ICanWePatternMatchThis_Interface, Is.False);
         
-        // InterfaceInjector.InjectInterface(typeof(CanWePatternMatchThis_Class), new InterfaceIdentity(typeof(ICanWePatternMatchThis_Interface), null));
+        InterfaceInjector.InjectInterface(typeof(CanWePatternMatchThis_Class), new InterfaceIdentity(typeof(ICanWePatternMatchThis_Interface), null));
         var b = new CanWePatternMatchThis_Class();
-        // Assert.That(b is ICanWePatternMatchThis_Interface, Is.True);
+        Assert.That(b is ICanWePatternMatchThis_Interface, Is.True);
         try
         {
             var c = (ICanWePatternMatchThis_Interface)(object)b;
