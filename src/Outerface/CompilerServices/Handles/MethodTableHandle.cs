@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace Outerface.CompilerServices.Handles;
 
 [TypeDef("src/coreclr/vm/methodtable.h", "class MethodTable")]
@@ -125,6 +127,33 @@ public sealed class MethodTableHandle : AbstractHandle, IHandleFactory<MethodTab
     {
         return mt1.Value == mt2.Value;
     }
+
+#region VTable
+    /*public const int VTABLE_SLOTS_PER_CHUNK      = 8;
+    public const int VTABLE_SLOTS_PER_CHUNK_LOG2 = 3;
+
+    public static uint GetIndexOfVTableIndirection(uint slotNum)
+    {
+        return slotNum >> VTABLE_SLOTS_PER_CHUNK_LOG2;
+    }
+
+    public VTableIndir_t* GetVTableInidrections()
+    {
+        return (VTableIndir_t*)((byte*)Unsafe.AsPointer(ref this) + sizeof(MethodTable));
+    }
+
+    public static VTableIndir2_t* VTableIndir_t__GetValueMaybeNullAtPtr(nint @base)
+    {
+        return (VTableIndir2_t*)@base;
+    }
+
+    public static uint GetIndexAfterVTableIndirection(uint slotNum)
+    {
+        return slotNum & (VTABLE_SLOTS_PER_CHUNK - 1);
+    }*/
+    
+    
+#endregion
 
 #region Factory
     public static MethodTableHandle Create(nint value)

@@ -26,10 +26,10 @@ public sealed class InterfaceIdentity
     /// </returns>
     public static InterfaceIdentity CreateEmpty(Type interfaceType)
     {
-        if (interfaceType.GetMethods().Length > 0)
-        {
-            throw new ArgumentException("Interface must have no methods to be empty.", nameof(interfaceType));
-        }
+        // if (interfaceType.GetMethods().Length > 0)
+        // {
+        //     throw new ArgumentException("Interface must have no methods to be empty.", nameof(interfaceType));
+        // }
 
         return new InterfaceIdentity(interfaceType, []);
     }

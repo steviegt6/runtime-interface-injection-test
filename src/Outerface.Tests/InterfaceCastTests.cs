@@ -100,7 +100,12 @@ public static class InterfaceCastTests
                 Assert.That(new ImplementedSealedClass() is IEmptyInterface,   Is.True);
             }
         );
+
+        InterfaceInjector.InjectInterfaces(typeof(UnsealedClass),   InterfaceIdentity.CreateEmpty(typeof(IA)));
+        ((IA)new UnsealedClass()).A();
     }
+
+    interface IA { void A(); }
 
     /*
      *     private class CanWePatternMatchThis_Class;

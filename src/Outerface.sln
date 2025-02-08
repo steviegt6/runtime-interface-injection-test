@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Outerface", "Outerface\Oute
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Outerface.Tests", "Outerface.Tests\Outerface.Tests.csproj", "{DCBEB878-CA27-4615-A04D-7A4C9C4A6498}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Outerface.EntrypointTest", "Outerface.EntrypointTest\Outerface.EntrypointTest.csproj", "{55BD4789-266D-462C-B92B-72D262EB015D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{DCBEB878-CA27-4615-A04D-7A4C9C4A6498}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DCBEB878-CA27-4615-A04D-7A4C9C4A6498}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DCBEB878-CA27-4615-A04D-7A4C9C4A6498}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55BD4789-266D-462C-B92B-72D262EB015D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55BD4789-266D-462C-B92B-72D262EB015D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55BD4789-266D-462C-B92B-72D262EB015D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55BD4789-266D-462C-B92B-72D262EB015D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
