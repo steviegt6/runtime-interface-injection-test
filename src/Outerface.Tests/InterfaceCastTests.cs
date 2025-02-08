@@ -100,36 +100,5 @@ public static class InterfaceCastTests
                 Assert.That(new ImplementedSealedClass() is IEmptyInterface,   Is.True);
             }
         );
-
-        InterfaceInjector.InjectInterfaces(typeof(UnsealedClass),   InterfaceIdentity.CreateEmpty(typeof(IA)));
-        ((IA)new UnsealedClass()).A();
     }
-
-    interface IA { void A(); }
-
-    /*
-     *     private class CanWePatternMatchThis_Class;
-
-    private interface ICanWePatternMatchThis_Interface;
-
-    [Test]
-    [SuppressMessage("ReSharper", "SuspiciousTypeConversion.Global")]
-    public static void CanWePatternMatchThis()
-    {
-        var beforeInjection = new CanWePatternMatchThis_Class();
-        Assert.That(beforeInjection is ICanWePatternMatchThis_Interface, Is.False);
-
-        InterfaceInjector.InjectInterfaces(typeof(CanWePatternMatchThis_Class), InterfaceIdentity.CreateEmpty(typeof(ICanWePatternMatchThis_Interface)));
-
-        var afterInjection = new CanWePatternMatchThis_Class();
-        Assert.Multiple(
-            () =>
-            {
-                Assert.That(afterInjection is ICanWePatternMatchThis_Interface, Is.True);
-                Assert.That(beforeInjection is ICanWePatternMatchThis_Interface, Is.True);
-                Assert.DoesNotThrow(() => _ = (ICanWePatternMatchThis_Interface)afterInjection);
-            }
-        );
-    }
-     */
 }
