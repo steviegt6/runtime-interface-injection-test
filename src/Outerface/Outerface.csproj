@@ -7,4 +7,8 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
+    <ItemGroup>
+        <PackageReference Include="Reloaded.Hooks" Version="4.3.3"/>
+    </ItemGroup>
+
 </Project>
