@@ -1,13 +1,9 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-using Reloaded.Hooks;
-using Reloaded.Hooks.Definitions;
-using Reloaded.Hooks.Definitions.X86;
+using MinHook;
 
 using CallingConventions = Reloaded.Hooks.Definitions.X86.CallingConventions;
 
@@ -42,7 +38,7 @@ public static partial class HookTest
 
             return -1;
         }
-        
+
         public static int FindPattern(byte[] data, string pattern)
         {
             var patternBytes = pattern.Split(' ')
@@ -83,6 +79,8 @@ public static partial class HookTest
         public nint TokenPtr;
     }
 
+    private static HookEngine engine = new();
+
     public static unsafe void Hook()
     {
         Console.WriteLine(Environment.Version);
@@ -110,7 +108,7 @@ public static partial class HookTest
         var coreclrMemory = SignatureScanner.ReadModuleMemory(coreclr);
         var fuckYouOffset = SignatureScanner.FindPatterns(coreclrMemory, "48 83 EC 38 E8 3F 1C F0 FF 48 83 64 24 28 00", "40 57 48 83 EC 30 E8 25 7F 50 00 48 C7 44");
 
-        var getThreadOffset = SignatureScanner.FindPatterns(coreclrMemory, "8B 0D FA B2 32 00 65 48 8B 04 25 58 00 00 00 BA 30 01 00 00", "40 57 33 C0 85 C0 74 02");
+        // var getThreadOffset = SignatureScanner.FindPatterns(coreclrMemory, "8B 0D FA B2 32 00 65 48 8B 04 25 58 00 00 00 BA 30 01 00 00", "40 57 33 C0 85 C0 74 02");
 
         var offset = SignatureScanner.FindPatterns(coreclrMemory, signatures);
 
@@ -120,22 +118,35 @@ public static partial class HookTest
         }
 
         Console.WriteLine($"Got initial offset: {offset}");
+        
+        // write ret instruction to the start of the ReversePInvokeBadTransition function (fuckYouOffset)
+        {
+            VirtualProtect(coreclr.BaseAddress + fuckYouOffset, 1, 0x40, out _);
+            var ret = new byte[] { 0xC3 };
+            Marshal.Copy(ret, 0, coreclr.BaseAddress + fuckYouOffset, ret.Length);
+        }
+        
+        Console.WriteLine("yay");
 
-        Console.WriteLine(fuckYouOffset);
+        // engine.EnableHook(engine.CreateHook(coreclr.BaseAddress + offset, new ReversePInvokeBadTransition(DisableBadTransition)));
+        orig = engine.CreateHook(coreclr.BaseAddress + offset, new VirtualCallStubManager__Resolver(ResolverImpl));
+        engine.EnableHook(orig);
+
+        // Console.WriteLine(fuckYouOffset);
 
         //origFunction = ReloadedHooks.Instance.CreateHook<VirtualCallStubManager__Resolver>((delegate* unmanaged[Cdecl]<nint, DispatchToken, nint, nint, int, int>)&ResolverImpl, coreclr.BaseAddress + offset).Activate();
         // fuckYou      = ReloadedHooks.Instance.CreateHook<ReversePInvokeBadTransition>(DisableBadTransition, coreclr.BaseAddress + fuckYouOffset).Activate();
-        origFunction = ReloadedHooks.Instance.CreateHook<VirtualCallStubManager__Resolver>(ResolverImpl, coreclr.BaseAddress    + offset).Activate();
+        // origFunction = ReloadedHooks.Instance.CreateHook<VirtualCallStubManager__Resolver>(ResolverImpl, coreclr.BaseAddress    + offset).Activate();
 
         /*var type = origFunction.GetType();
         Console.WriteLine(origFunction.GetType());
         Console.WriteLine(origFunction.GetType().GetMethod("Invoke", BindingFlags.NonPublic | BindingFlags.Instance));*/
     }
 
-    private static IHook<VirtualCallStubManager__Resolver> origFunction;
-    private static IHook<ReversePInvokeBadTransition>      fuckYou;
+    // private static IHook<VirtualCallStubManager__Resolver> origFunction;
+    // private static IHook<ReversePInvokeBadTransition>      fuckYou;
 
-    [Function(CallingConventions.Cdecl)]
+    // [Function(CallingConventions.Cdecl)]
     private delegate int VirtualCallStubManager__Resolver(
         nint          pMt,
         DispatchToken token,
@@ -143,6 +154,8 @@ public static partial class HookTest
         nint          ppTarget,
         int           throwOnConflict
     );
+
+    private static VirtualCallStubManager__Resolver orig;
 
     //[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
     private static int ResolverImpl(
@@ -154,11 +167,15 @@ public static partial class HookTest
     )
     {
         Console.WriteLine("Resolver: " + pMt);
-        return origFunction.OriginalFunction(pMt, token, protectedObj, ppTarget, throwOnConflict);
+        return orig(pMt, token, protectedObj, ppTarget, throwOnConflict);
     }
 
-    [Function(CallingConventions.Cdecl)]
+    // [Function(CallingConventions.Cdecl)]
     private delegate void ReversePInvokeBadTransition();
 
     private static void DisableBadTransition() { }
+    
+    // define virtualprotect
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern bool VirtualProtect(nint lpAddress, nint dwSize, uint flNewProtect, out uint lpflOldProtect);
 }

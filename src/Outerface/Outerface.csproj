@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="MinHook.NET" Version="1.1.1"/>
         <PackageReference Include="Reloaded.Hooks" Version="4.3.3"/>
     </ItemGroup>
 
